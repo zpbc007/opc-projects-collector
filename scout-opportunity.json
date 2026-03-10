@@ -1,0 +1,19 @@
+{
+  "name": "AI 驱动的个人知识库自动化整理工具",
+  "description": "一个智能知识管理 SaaS，自动从用户的多数据源（邮件、文档、聊天记录、浏览器历史）抓取信息，使用 AI 进行分类、标签化和关联分析。核心价值：让用户无需手动整理，自动构建个人第二大脑。支持语义搜索、知识图谱可视化、自动摘要生成。",
+  "source": "知识库生成（网络搜索降级）",
+  "domain": "效率",
+  "targetUsers": "知识工作者、研究者、内容创作者、创业者",
+  "painPoint": "信息碎片化严重，跨平台知识难以整合，手动整理耗时且容易遗忘",
+  "solution": "AI 自动聚合 + 语义理解 + 智能关联，零配置即可开始使用",
+  "businessModel": "Freemium - 免费版限 3 个数据源 + 1000 条记录；Pro $9.9/月解锁无限数据源和高级分析；Team $29/人/月增加协作功能",
+  "techStack": "后端 Python/FastAPI + 向量数据库(Pinecone/Milvus) + LLM API；前端 React/Next.js",
+  "difficulty": "中等",
+  "differentiation": "相比 Notion/Obsidian 需手动整理，本产品主打「零维护」；相比 Cubox/Readwise 聚焦阅读，本产品覆盖更广泛的数据源",
+  "marketSize": "全球知识管理工具市场约 $150 亿，年增长 15%+",
+  "competitors": "Notion、Obsidian、Roam Research、Cubox、Readwise、Mem.ai",
+  "opcFit": "✓ 高度适合 OPC：技术驱动，边际成本趋零，可复制规模化，一次开发长期收益",
+  "trendScore": 9,
+  "timestamp": "2026-03-08T21:00:45+08:00",
+  "searchFallback": true
+}
