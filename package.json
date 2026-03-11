@@ -1,15 +1,21 @@
 {
-  "name": "data",
+  "name": "opc-projects-collector",
   "version": "1.0.0",
-  "description": "",
+  "description": "OPC商业机会发现和管理系统",
   "main": "scout-store.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
-  "keywords": [],
+  "keywords": ["opc", "opportunity", "scout", "ai"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "better-sqlite3": "^12.6.2"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0"
   }
 }

@@ -14,8 +14,13 @@ const path = require('path');
 
 const DB_PATH = path.join(__dirname, 'opportunities.db');
 
+// 支持测试时注入数据库路径
+function getDbPath() {
+  return process.env.TEST_DB_PATH || DB_PATH;
+}
+
 function getDb() {
-  return new Database(DB_PATH);
+  return new Database(getDbPath());
 }
 
 function migrate() {
@@ -171,3 +176,12 @@ switch (cmd) {
       commands: ['migrate', 'update <id> <json>', 'list', 'unscored']
     }));
 }
+
+// 导出函数供测试使用
+module.exports = {
+  getDb,
+  migrate,
+  update,
+  list,
+  unscored
+};

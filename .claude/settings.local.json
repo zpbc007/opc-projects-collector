@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd D:/code/self/opc-projects-collector && npm install)",
+      "Bash(cd D:/code/self/opc-projects-collector && npm test)",
+      "Bash(cd D:/code/self/opc-projects-collector && npm run test:coverage)"
+    ]
+  }
+}

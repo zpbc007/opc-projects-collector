@@ -66,9 +66,9 @@ const TRENDING_DOMAINS = [
   { domain: '电动汽车', keywords: ['电动汽车', '充电桩', '新能源车', 'EV', '电池'], priority: 7 }
 ];
 
-function initDb() {
+function initDb(dbPath = null) {
   const Database = require('better-sqlite3');
-  return new Database(DB_PATH);
+  return new Database(dbPath || process.env.TEST_DB_PATH || DB_PATH);
 }
 
 // 分析已覆盖的领域
@@ -232,11 +232,15 @@ function generateSearchStrategy(opportunities, focusDomain = null) {
 }
 
 // 主函数
+// options.db 用于测试时注入外部数据库实例
 function analyze(options = {}) {
-  const db = initDb();
+  const shouldClose = !options.db;
+  const db = options.db || initDb();
   const opportunities = db.prepare('SELECT * FROM opportunities ORDER BY created_at DESC').all();
-  db.close();
-  
+  if (shouldClose) {
+    db.close();
+  }
+
   if (opportunities.length === 0) {
     return {
       mode: 'empty',
@@ -247,7 +251,7 @@ function analyze(options = {}) {
       }))
     };
   }
-  
+
   return generateSearchStrategy(opportunities, options.focus);
 }
 

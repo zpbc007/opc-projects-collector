@@ -10,9 +10,14 @@ const fs = require('fs');
 
 const DB_PATH = path.join(__dirname, 'opportunities.db');
 
+// 支持测试时注入数据库路径
+function getDbPath() {
+  return process.env.TEST_DB_PATH || DB_PATH;
+}
+
 // 初始化数据库
-function initDb() {
-  const db = new Database(DB_PATH);
+function initDb(dbPath = null) {
+  const db = new Database(dbPath || getDbPath());
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS opportunities (
@@ -63,8 +68,10 @@ function parseOpportunities(text) {
 }
 
 // 存储机会（去重）
-function storeOpportunities(opportunities) {
-  const db = initDb();
+// db 参数用于测试时注入外部数据库实例
+function storeOpportunities(opportunities, externalDb = null) {
+  const shouldClose = !externalDb;
+  const db = externalDb || initDb();
   const stmt = db.prepare(`
     INSERT OR IGNORE INTO opportunities (name, description, insight)
     VALUES (@name, @description, @insight)
@@ -99,25 +106,35 @@ function storeOpportunities(opportunities) {
     }
   }
 
-  db.close();
+  if (shouldClose) {
+    db.close();
+  }
   return results;
 }
 
 // 获取所有机会
-function getAllOpportunities(limit = 100) {
-  const db = initDb();
+// db 参数用于测试时注入外部数据库实例
+function getAllOpportunities(limit = 100, externalDb = null) {
+  const shouldClose = !externalDb;
+  const db = externalDb || initDb();
   const stmt = db.prepare(`SELECT * FROM opportunities ORDER BY created_at DESC LIMIT ?`);
   const results = stmt.all(limit);
-  db.close();
+  if (shouldClose) {
+    db.close();
+  }
   return results;
 }
 
 // 统计
-function getStats() {
-  const db = initDb();
+// db 参数用于测试时注入外部数据库实例
+function getStats(externalDb = null) {
+  const shouldClose = !externalDb;
+  const db = externalDb || initDb();
   const count = db.prepare(`SELECT COUNT(*) as total FROM opportunities`).get();
   const latest = db.prepare(`SELECT created_at FROM opportunities ORDER BY created_at DESC LIMIT 1`).get();
-  db.close();
+  if (shouldClose) {
+    db.close();
+  }
   return {
     total: count?.total || 0,
     latestAt: latest?.created_at || null
