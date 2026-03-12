@@ -3,10 +3,9 @@ import {
   analyzeCoveredDomains,
   extractKeywords,
   recommendBlankDomains,
-  generateSearchStrategy,
-  DOMAIN_KEYWORDS,
-  TRENDING_DOMAINS
-} from '../../scout-analyze.js';
+  generateSearchStrategy
+} from '../../src/lib/analyze.js';
+import { DOMAIN_KEYWORDS, TRENDING_DOMAINS } from '../../src/config/domains.js';
 
 describe('analyzeCoveredDomains', () => {
   it('should identify domains from opportunity text', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { parseOpportunities, storeOpportunities, getAllOpportunities, getStats } from '../../scout-store.js';
+import { parseOpportunities, storeOpportunities, getAllOpportunities, getStats } from '../../src/lib/store.js';
 import { createOpportunity, createOpportunities, TEST_INPUTS } from '../helpers/fixtures.js';
 
 describe('scout-store (integration)', () => {

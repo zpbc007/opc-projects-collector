@@ -1,19 +1,10 @@
-#!/usr/bin/env node
 /**
  * Scout Opportunity Storage
  * 存储和去重 scout 发现的机会
  */
 
 const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
-
-const DB_PATH = path.join(__dirname, 'opportunities.db');
-
-// 支持测试时注入数据库路径
-function getDbPath() {
-  return process.env.TEST_DB_PATH || DB_PATH;
-}
+const { getDbPath } = require('../config/database');
 
 // 初始化数据库
 function initDb(dbPath = null) {
@@ -42,7 +33,7 @@ function parseOpportunities(text) {
   if (typeof text !== 'string') {
     text = String(text || '');
   }
-  
+
   try {
     // 尝试直接解析
     const json = JSON.parse(text);
@@ -139,49 +130,6 @@ function getStats(externalDb = null) {
     total: count?.total || 0,
     latestAt: latest?.created_at || null
   };
-}
-
-// CLI 接口
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  const command = args[0];
-
-  switch (command) {
-    case 'store': {
-      const input = args[1] || process.stdin;
-      if (input === '-') {
-        let data = '';
-        process.stdin.on('data', chunk => data += chunk);
-        process.stdin.on('end', () => {
-          const opps = parseOpportunities(data);
-          const result = storeOpportunities(opps);
-          console.log(JSON.stringify(result, null, 2));
-        });
-      } else {
-        const opps = parseOpportunities(input);
-        const result = storeOpportunities(opps);
-        console.log(JSON.stringify(result, null, 2));
-      }
-      break;
-    }
-    case 'list': {
-      const limit = parseInt(args[1]) || 100;
-      const opps = getAllOpportunities(limit);
-      console.log(JSON.stringify(opps, null, 2));
-      break;
-    }
-    case 'stats': {
-      const stats = getStats();
-      console.log(JSON.stringify(stats, null, 2));
-      break;
-    }
-    default:
-      console.log(`Usage:
-  node scout-store.js store '<json>'    - 存储机会（去重）
-  cat result.json | node scout-store.js store -   - 从 stdin 读取
-  node scout-store.js list [limit]      - 列出所有机会
-  node scout-store.js stats             - 显示统计`);
-  }
 }
 
 module.exports = {

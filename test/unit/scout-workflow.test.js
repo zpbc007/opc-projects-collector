@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { processResult } from '../../scout-workflow.js';
+import { processResult } from '../../src/lib/workflow.js';
 
-// Mock scout-store 模块
-vi.mock('../../scout-store.js', () => ({
+// Mock store 模块
+vi.mock('../../src/lib/store.js', () => ({
   parseOpportunities: vi.fn((text) => {
     try {
       const json = JSON.parse(text);

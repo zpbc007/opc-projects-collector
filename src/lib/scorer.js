@@ -1,23 +1,10 @@
-#!/usr/bin/env node
 /**
- * Project Scorer 数据库操作脚本
- * 
- * 用法:
- *   node scorer-workflow.js migrate     - 添加评分字段
- *   node scorer-workflow.js update <id> '<JSON评分结果>'  - 更新项目评分
- *   node scorer-workflow.js list        - 列出所有项目（含评分状态）
- *   node scorer-workflow.js unscored    - 列出未评分项目
+ * Project Scorer 数据库操作
+ * 多角色评分系统的数据层
  */
 
 const Database = require('better-sqlite3');
-const path = require('path');
-
-const DB_PATH = path.join(__dirname, 'opportunities.db');
-
-// 支持测试时注入数据库路径
-function getDbPath() {
-  return process.env.TEST_DB_PATH || DB_PATH;
-}
+const { getDbPath } = require('../config/database');
 
 function getDb() {
   return new Database(getDbPath());
@@ -25,11 +12,11 @@ function getDb() {
 
 function migrate() {
   const db = getDb();
-  
+
   // 检查字段是否已存在
   const columns = db.prepare('PRAGMA table_info(opportunities)').all();
   const columnNames = columns.map(c => c.name);
-  
+
   const newColumns = [
     { name: 'product_score', type: 'INTEGER' },
     { name: 'dev_score', type: 'INTEGER' },
@@ -46,7 +33,7 @@ function migrate() {
     { name: 'pessimist_brief', type: 'TEXT' },
     { name: 'scored_at', type: 'TEXT' }
   ];
-  
+
   let added = 0;
   for (const col of newColumns) {
     if (!columnNames.includes(col.name)) {
@@ -54,36 +41,31 @@ function migrate() {
       added++;
     }
   }
-  
+
   db.close();
-  
-  if (added > 0) {
-    console.log(JSON.stringify({ success: true, message: `已添加 ${added} 个评分字段` }));
-  } else {
-    console.log(JSON.stringify({ success: true, message: '评分字段已存在，无需迁移' }));
-  }
+
+  return { success: true, added, message: added > 0 ? `已添加 ${added} 个评分字段` : '评分字段已存在，无需迁移' };
 }
 
 function update(id, scoreJsonStr) {
   const db = getDb();
-  
+
   let scoreData;
   try {
     scoreData = JSON.parse(scoreJsonStr);
   } catch (e) {
-    console.log(JSON.stringify({ success: false, error: '无效的 JSON 格式' }));
     db.close();
-    return;
+    return { success: false, error: '无效的 JSON 格式' };
   }
-  
+
   // 提取各角色评分
   const roleMap = {};
   for (const role of scoreData.roles || []) {
     roleMap[role.role.toLowerCase()] = role;
   }
-  
+
   const stmt = db.prepare(`
-    UPDATE opportunities SET 
+    UPDATE opportunities SET
       product_score = ?, product_brief = ?,
       dev_score = ?, dev_brief = ?,
       marketing_score = ?, marketing_brief = ?,
@@ -94,7 +76,7 @@ function update(id, scoreJsonStr) {
       scored_at = datetime('now', 'localtime')
     WHERE id = ?
   `);
-  
+
   const result = stmt.run(
     roleMap['product']?.score || null,
     roleMap['product']?.brief || null,
@@ -111,31 +93,31 @@ function update(id, scoreJsonStr) {
     scoreData.final_score || null,
     id
   );
-  
+
   db.close();
-  
+
   if (result.changes > 0) {
-    console.log(JSON.stringify({ 
-      success: true, 
+    return {
+      success: true,
       message: `项目 #${id} 评分已更新`,
-      final_score: scoreData.final_score 
-    }));
+      final_score: scoreData.final_score
+    };
   } else {
-    console.log(JSON.stringify({ success: false, error: `未找到项目 #${id}` }));
+    return { success: false, error: `未找到项目 #${id}` };
   }
 }
 
 function list() {
   const db = getDb();
   const rows = db.prepare(`
-    SELECT id, name, final_score, 
+    SELECT id, name, final_score,
            CASE WHEN final_score IS NULL THEN '未评分' ELSE '已评分' END as status,
            created_at, scored_at
     FROM opportunities
     ORDER BY id DESC
   `).all();
   db.close();
-  console.log(JSON.stringify(rows, null, 2));
+  return rows;
 }
 
 function unscored() {
@@ -147,37 +129,9 @@ function unscored() {
     ORDER BY id DESC
   `).all();
   db.close();
-  console.log(JSON.stringify({ count: rows.length, items: rows }, null, 2));
+  return { count: rows.length, items: rows };
 }
 
-// 主入口
-const [,, cmd, ...args] = process.argv;
-
-switch (cmd) {
-  case 'migrate':
-    migrate();
-    break;
-  case 'update':
-    if (!args[0] || !args[1]) {
-      console.log(JSON.stringify({ error: '用法: node scorer-workflow.js update <id> "<JSON评分结果>"' }));
-      process.exit(1);
-    }
-    update(parseInt(args[0]), args.slice(1).join(' '));
-    break;
-  case 'list':
-    list();
-    break;
-  case 'unscored':
-    unscored();
-    break;
-  default:
-    console.log(JSON.stringify({
-      usage: 'node scorer-workflow.js <command>',
-      commands: ['migrate', 'update <id> <json>', 'list', 'unscored']
-    }));
-}
-
-// 导出函数供测试使用
 module.exports = {
   getDb,
   migrate,

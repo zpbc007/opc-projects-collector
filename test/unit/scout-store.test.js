@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseOpportunities } from '../../scout-store.js';
+import { parseOpportunities } from '../../src/lib/store.js';
 
 describe('parseOpportunities', () => {
   describe('valid input', () => {

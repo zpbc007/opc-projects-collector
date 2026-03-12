@@ -6,7 +6,7 @@ import {
   recommendBlankDomains,
   generateSearchStrategy,
   analyze
-} from '../../scout-analyze.js';
+} from '../../src/lib/analyze.js';
 import { SCOPED_OPPORTUNITIES, createOpportunities } from '../helpers/fixtures.js';
 import { seedOpportunities } from '../helpers/db.js';
 

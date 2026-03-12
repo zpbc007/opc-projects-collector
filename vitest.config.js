@@ -9,8 +9,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['html', 'text'],
-      include: ['scout-*.js', 'scorer-*.js'],
-      exclude: ['**/*.test.js', '**/test/**'],
+      include: ['src/lib/*.js'],
+      exclude: ['**/*.test.js', '**/test/**', 'cli/**'],
       thresholds: {
         global: { lines: 70 }
       }
@@ -19,7 +19,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '.')
+      '@': path.resolve(__dirname, 'src'),
+      '@lib': path.resolve(__dirname, 'src/lib'),
+      '@config': path.resolve(__dirname, 'src/config')
     }
   }
 });

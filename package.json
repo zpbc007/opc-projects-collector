@@ -2,11 +2,16 @@
   "name": "opc-projects-collector",
   "version": "1.0.0",
   "description": "OPC商业机会发现和管理系统",
-  "main": "scout-store.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "cli:store": "node cli/store.js",
+    "cli:analyze": "node cli/analyze.js",
+    "cli:workflow": "node cli/workflow.js",
+    "cli:scorer": "node cli/scorer.js",
+    "cli:pipeline": "node cli/pipeline.js"
   },
   "keywords": ["opc", "opportunity", "scout", "ai"],
   "author": "",
@@ -17,5 +22,14 @@
   "devDependencies": {
     "vitest": "^2.0.0",
     "@vitest/coverage-v8": "^2.0.0"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./store": "./src/lib/store.js",
+    "./analyze": "./src/lib/analyze.js",
+    "./workflow": "./src/lib/workflow.js",
+    "./scorer": "./src/lib/scorer.js",
+    "./pipeline": "./src/lib/pipeline.js",
+    "./domains": "./src/config/domains.js"
   }
 }

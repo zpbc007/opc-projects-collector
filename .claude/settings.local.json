@@ -3,7 +3,12 @@
     "allow": [
       "Bash(cd D:/code/self/opc-projects-collector && npm install)",
       "Bash(cd D:/code/self/opc-projects-collector && npm test)",
-      "Bash(cd D:/code/self/opc-projects-collector && npm run test:coverage)"
+      "Bash(cd D:/code/self/opc-projects-collector && npm run test:coverage)",
+      "Bash(find . -type f -name \"*.js\" -o -name \"*.json\" -o -name \"*.md\" -o -name \"*.db\" 2>/dev/null | head -50)",
+      "Bash(cd D:/code/self/opc-projects-collector && npm test 2>&1)",
+      "Bash(cd D:/code/self/opc-projects-collector && node cli/store.js stats 2>&1)",
+      "Bash(cd D:/code/self/opc-projects-collector && node cli/analyze.js recommend 2>&1)",
+      "Bash(cd D:/code/self/opc-projects-collector && node cli/pipeline.js stats 2>&1)"
     ]
   }
 }

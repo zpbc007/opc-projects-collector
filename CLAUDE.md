@@ -6,40 +6,86 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 OPC Projects Collector is a commercial opportunity discovery and management system. It uses AI-powered agents to discover business opportunities, stores them in SQLite with deduplication, and provides multi-dimensional scoring for evaluation based on the OPC methodology (a framework for zero marginal cost product-based businesses).
 
+## Directory Structure
+
+```
+opc-projects-collector/
+├── src/
+│   ├── lib/              # Core library modules
+│   │   ├── store.js      # Database storage layer
+│   │   ├── analyze.js    # Domain analysis engine
+│   │   ├── workflow.js   # Scout workflow orchestration
+│   │   ├── scorer.js     # Multi-role scoring system
+│   │   └── pipeline.js   # Pipeline automation
+│   ├── config/           # Configuration modules
+│   │   ├── domains.js    # Domain keywords and trending domains
+│   │   └── database.js   # Database path configuration
+│   └── index.js          # Unified exports
+├── cli/                  # CLI entry scripts
+│   ├── store.js
+│   ├── analyze.js
+│   ├── workflow.js
+│   ├── scorer.js
+│   └── pipeline.js
+├── data/                 # Data files
+│   └── opportunities.db  # SQLite database
+├── test/                 # Test files
+│   ├── unit/
+│   ├── integration/
+│   ├── helpers/
+│   └── fixtures/
+└── coverage/             # Coverage reports
+```
+
 ## Development Commands
 
 ```bash
+# Run tests
+npm test                  # Run all tests
+npm run test:watch        # Watch mode
+npm run test:coverage     # With coverage report
+
 # Storage operations
-node scout-store.js store '<json>'      # Store opportunities from JSON string
-node scout-store.js list [limit]       # List stored opportunities (default: 20)
-node scout-store.js stats              # Show database statistics
+node cli/store.js store '<json>'      # Store opportunities from JSON string
+node cli/store.js list [limit]        # List stored opportunities (default: 100)
+node cli/store.js stats               # Show database statistics
 
 # Domain analysis
-node scout-analyze.js                  # Full analysis report
-node scout-analyze.js domains          # Show covered domains
-node scout-analyze.js keywords         # Show trending keywords
-node scout-analyze.js recommend        # Recommend blank domains to explore
+node cli/analyze.js                   # Full analysis report
+node cli/analyze.js domains           # Show covered domains
+node cli/analyze.js keywords          # Show trending keywords
+node cli/analyze.js recommend         # Recommend blank domains to explore
 
 # Opportunity scoring
-node scorer-workflow.js migrate        # Add scoring fields to database
-node scorer-workflow.js update <id> '<json>'  # Update opportunity scores
-node scorer-workflow.js list           # List all scored projects
-node scorer-workflow.js unscored       # List items without scores
+node cli/scorer.js migrate            # Add scoring fields to database
+node cli/scorer.js update <id> '<json>'  # Update opportunity scores
+node cli/scorer.js list               # List all scored projects
+node cli/scorer.js unscored           # List items without scores
 
 # Pipeline orchestration
-node scout-pipeline.js analyze         # Run analysis and recommendations
-node scout-pipeline.js stats           # Show pipeline statistics
+node cli/pipeline.js analyze          # Run analysis and recommendations
+node cli/pipeline.js stats            # Show pipeline statistics
+
+# Using npm scripts (alternative)
+npm run cli:store -- stats
+npm run cli:analyze -- recommend
+npm run cli:pipeline -- stats
 ```
 
 ## Architecture
 
-### Core Modules
+### Core Modules (src/lib/)
 
-- **scout-store.js** - Database layer with SQLite storage, handles opportunity parsing and deduplication via unique constraint on `(name, description)`
-- **scout-workflow.js** - Orchestrates Scout Agent discovery sessions via `sessions_spawn`
-- **scout-analyze.js** - Domain coverage analysis and search strategy generation
-- **scorer-workflow.js** - Multi-role scoring system (Product, Dev, Marketing, Ops, Optimist, Pessimist perspectives)
-- **scout-pipeline.js** - Pipeline automation that orchestrates the full workflow
+- **store.js** - Database layer with SQLite storage, handles opportunity parsing and deduplication via unique constraint on `(name, description)`
+- **workflow.js** - Orchestrates Scout Agent discovery sessions via `sessions_spawn`
+- **analyze.js** - Domain coverage analysis and search strategy generation
+- **scorer.js** - Multi-role scoring system (Product, Dev, Marketing, Ops, Optimist, Pessimist perspectives)
+- **pipeline.js** - Pipeline automation that orchestrates the full workflow
+
+### Configuration (src/config/)
+
+- **domains.js** - Contains `DOMAIN_KEYWORDS`, `RELATED_DOMAINS`, and `TRENDING_DOMAINS` constants
+- **database.js** - Database path configuration with test support via `TEST_DB_PATH` environment variable
 
 ### Database Schema
 
@@ -49,10 +95,11 @@ Single `opportunities` table with:
 
 ### Key Patterns
 
-1. **Dual-purpose modules**: Each file exports functions AND provides CLI interface when run directly
+1. **Separation of concerns**: Library functions in `src/lib/`, CLI interfaces in `cli/`
 2. **Smart JSON parsing**: `parseOpportunities()` handles malformed AI responses with regex fallbacks
 3. **Domain classification**: Pre-defined matrix with 12+ categories and keyword-based classification
 4. **Trending domains**: 15 emerging domains tracked (AI Agent, Web3, Low-code, etc.)
+5. **Test-friendly design**: Database operations support external DB instance injection
 
 ### Domain Matrix
 
@@ -60,10 +107,12 @@ The system tracks coverage across domains: Game, AI, SaaS, E-commerce, Content, 
 
 ## Dependencies
 
-- `better-sqlite3` v12.6.2 - Synchronous SQLite bindings (only dependency)
+- `better-sqlite3` v12.6.2 - Synchronous SQLite bindings (only production dependency)
+- `vitest` v2.0.0 - Test framework (dev dependency)
+- `@vitest/coverage-v8` v2.0.0 - Coverage reporter (dev dependency)
 
 ## Notes
 
 - Code comments and UI text are primarily in Chinese
-- No test suite configured - `npm test` exits with error
-- Database file `opportunities.db` is created at runtime
+- Database file stored in `data/opportunities.db`
+- Test suite available via `npm test`
