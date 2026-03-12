@@ -133,7 +133,6 @@ function unscored() {
 }
 
 module.exports = {
-  getDb,
   migrate,
   update,
   list,

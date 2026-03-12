@@ -2,7 +2,6 @@
  * Scout Workflow - 主 Agent 调用 Scout 子 Agent 的完整工作流
  */
 
-const path = require('path');
 const { parseOpportunities, storeOpportunities } = require('./store');
 
 async function runScout(topic, options = {}) {

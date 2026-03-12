@@ -4,7 +4,7 @@
  * 主 Agent 调用 Scout 子 Agent 的完整工作流
  */
 
-const { runScout, processResult } = require('../src/lib/workflow');
+const { processResult } = require('../src/lib/workflow');
 const { getStats, getAllOpportunities } = require('../src/lib/store');
 
 const args = process.argv.slice(2);

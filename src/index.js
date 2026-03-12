@@ -40,7 +40,6 @@ module.exports = {
   processResult: workflow.processResult,
 
   // 便捷导出 - 评分模块
-  getScorerDb: scorer.getDb,
   migrateScorer: scorer.migrate,
   updateScore: scorer.update,
   listScored: scorer.list,
